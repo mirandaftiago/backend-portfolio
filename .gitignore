@@ -28,3 +28,9 @@ Thumbs.db
 # Testing
 coverage/
 .nyc_output/
+
+# Prisma
+prisma/migrations/*
+!prisma/migrations/.gitkeep
+
+/src/generated/prisma
