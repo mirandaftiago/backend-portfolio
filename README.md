@@ -192,7 +192,7 @@ task-management-api/
    # Edit .env with your configuration
 ```
 
-4. **Run database migrations** (coming soon)
+4. **Run database migrations**
 ```bash
    pnpm prisma migrate dev
 ```
@@ -273,6 +273,8 @@ This project is currently in **Phase 1** of development:
 
 - [x] Phase 1: Foundation & TypeScript Setup
 - [ ] Phase 2: Database & User Management
+   - [x] Phase 2.1: Prisma Setup & Database Schema (in progress)
+   - [ ] Phase 2.2: User Registration
 - [ ] Phase 3: Task Management & Authorization
 - [ ] Phase 4: Advanced Features & Performance
 - [ ] Phase 5: Testing & Quality Assurance
@@ -284,7 +286,8 @@ This project demonstrates understanding of:
 
 - ✅ TypeScript configuration and type safety
 - ✅ RESTful API architecture
-- ⏳ Database design and relationships
+- ✅ Prisma ORM and database migrations
+- ✅ PostgreSQL setup and configuration
 - ⏳ Authentication & Authorization patterns
 - ⏳ Error handling and validation
 - ⏳ Testing strategies (TDD)
@@ -303,7 +306,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Tiago Miranda**
 
 - GitHub: [@mirandaftiago](https://github.com/mirandaftiago)
-- Project: [Task Management API](https://github.com/mirandaftiago/task-management-api)
+- Project: [Task Management API](https://github.com/mirandaftiago/backend-portfolio.git)
 - Email: miranda.f.tiago@gmail.com
 - Linkedin: https://www.linkedin.com/in/tiagofilipemiranda/
 
