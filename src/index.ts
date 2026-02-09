@@ -33,5 +33,10 @@ app.listen(PORT, () => {
   console.log(`📡 Environment: ${NODE_ENV}`);
   console.log(`🔗 Server running on: http://localhost:${PORT}`);
   console.log(`💚 Health check: http://localhost:${PORT}/health`);
-  console.log(`🔐 Auth endpoint: http://localhost:${PORT}/api/auth/register`);
+  console.log(`🔐 Auth endpoints:`);
+  console.log(`   POST http://localhost:${PORT}/api/auth/register`);
+  console.log(`   POST http://localhost:${PORT}/api/auth/login`);
+  console.log(`   POST http://localhost:${PORT}/api/auth/refresh`);
+  console.log(`   POST http://localhost:${PORT}/api/auth/logout`);
+  console.log(`   GET  http://localhost:${PORT}/api/auth/me (protected)`);
 });

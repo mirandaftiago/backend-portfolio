@@ -30,3 +30,15 @@ export const registerSchema = z.object({
  * Type inference from schema
  */
 export type RegisterDTO = z.infer<typeof registerSchema>;
+/**
+ * User login validation schema
+ */
+export const loginSchema = z.object({
+  email: z.string().email('Invalid email format').toLowerCase(),
+  password: z.string().min(1, 'Password is required'),
+});
+
+/**
+ * Type inference from schema
+ */
+export type LoginDTO = z.infer<typeof loginSchema>;
