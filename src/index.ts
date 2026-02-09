@@ -4,6 +4,7 @@ import 'dotenv/config';
 import express, { Application } from 'express';
 import healthRoutes from './routes/health.routes';
 import authRoutes from './routes/auth.routes';
+import taskRoutes from './routes/task.routes';
 import { errorHandler, notFoundHandler } from './middleware/error.middleware';
 
 // Initialize Express app
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use(healthRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/tasks', taskRoutes);
 
 // 404 handler
 app.use(notFoundHandler);
@@ -39,4 +41,11 @@ app.listen(PORT, () => {
   console.log(`   POST http://localhost:${PORT}/api/auth/refresh`);
   console.log(`   POST http://localhost:${PORT}/api/auth/logout`);
   console.log(`   GET  http://localhost:${PORT}/api/auth/me (protected)`);
+  console.log(`📝 Task endpoints (all protected):`);
+  console.log(`   POST   http://localhost:${PORT}/api/tasks`);
+  console.log(`   GET    http://localhost:${PORT}/api/tasks`);
+  console.log(`   GET    http://localhost:${PORT}/api/tasks/stats`);
+  console.log(`   GET    http://localhost:${PORT}/api/tasks/:id`);
+  console.log(`   PATCH  http://localhost:${PORT}/api/tasks/:id`);
+  console.log(`   DELETE http://localhost:${PORT}/api/tasks/:id`);
 });
