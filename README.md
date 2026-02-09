@@ -27,7 +27,12 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 - [x] User registration with validation
 - [x] Password hashing (bcrypt)
 - [x] Email and username uniqueness checks
-- [ ] User authentication (JWT with refresh tokens)
+- [x] User authentication (JWT with refresh tokens)
+- [x] JWT access tokens (15min expiry)
+- [x] JWT refresh tokens (7 days expiry)
+- [x] Token refresh endpoint
+- [x] Logout endpoint
+- [x] Protected routes with authentication middleware
 - [ ] Task CRUD operations
 - [ ] Advanced filtering and pagination
 - [ ] File attachments
@@ -46,9 +51,8 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 - Express.js - Web framework
 - Prisma 5.22 - ORM for PostgreSQL
 - Zod - Schema validation
-- JWT - Authentication
 - Bcrypt - Password hashing
-- JWT - Authentication (coming soon)
+- jsonwebtoken - JWT Authentication
 
 **Database:**
 - PostgreSQL - Primary database
@@ -162,6 +166,12 @@ PORT=3000
 
 # Database
 DATABASE_URL=postgresql://user:password@localhost:5432/taskdb?schema=public
+
+# JWT
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+JWT_REFRESH_SECRET=your-super-secret-refresh-key-change-this-in-production
+JWT_EXPIRES_IN=15m
+JWT_REFRESH_EXPIRES_IN=7d
 ```
 
 ## 📚 API Documentation
@@ -199,18 +209,97 @@ Content-Type: application/json
 - Email: Valid email format
 - Password: Min 8 characters, must contain uppercase, lowercase, and number
 
-### Health Check
+---
+
+#### Login User
 ```http
-GET /health
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "SecurePass123"
+}
 ```
 
 **Response (200 OK):**
 ```json
 {
-  "status": "healthy",
-  "timestamp": "2026-02-09T00:00:00.000Z",
-  "uptime": 123.45,
-  "environment": "development"
+  "message": "Login successful",
+  "data": {
+    "user": {
+      "id": "uuid",
+      "username": "johndoe",
+      "email": "john@example.com",
+      "createdAt": "2026-02-09T00:00:00.000Z",
+      "updatedAt": "2026-02-09T00:00:00.000Z"
+    },
+    "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
+  }
+}
+```
+
+---
+
+#### Refresh Token
+```http
+POST /api/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Token refreshed successfully",
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
+  }
+}
+```
+
+---
+
+#### Logout
+```http
+POST /api/auth/logout
+Content-Type: application/json
+
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Logout successful"
+}
+```
+
+---
+
+#### Get Current User (Protected)
+```http
+GET /api/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Profile retrieved successfully",
+  "data": {
+    "userId": "uuid",
+    "email": "john@example.com",
+    "iat": 1234567890,
+    "exp": 1234568790
+  }
 }
 ```
 
@@ -238,7 +327,15 @@ This project is currently in **Phase 2** of development:
   - [x] Custom error handling
   - [x] DTOs for safe responses
 
-- [ ] Phase 2.3: User Login & JWT Authentication (next)
+- [x] Phase 2.3: User Login & JWT Authentication
+  - [x] JWT access and refresh tokens
+  - [x] Login endpoint
+  - [x] Token refresh with rotation
+  - [x] Logout endpoint with token invalidation
+  - [x] Authentication middleware
+  - [x] Protected routes
+  - [x] Refresh token storage in database
+
 - [ ] Phase 3: Task Management & Authorization
 - [ ] Phase 4: Advanced Features & Performance
 - [ ] Phase 5: Testing & Quality Assurance
@@ -259,7 +356,10 @@ This project demonstrates understanding of:
 - ✅ Service layer for business logic
 - ✅ DTOs for safe data transfer
 - ✅ Custom error handling
-- ⏳ JWT authentication (in progress)
+- ✅ JWT authentication and authorization
+- ✅ Access and refresh token patterns
+- ✅ Token rotation for security
+- ✅ Protected route middleware
 - ⏳ Testing strategies (TDD)
 - ⏳ Production deployment
 
