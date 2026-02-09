@@ -24,6 +24,9 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 
 ## 🚀 Features
 
+- [x] User registration with validation
+- [x] Password hashing (bcrypt)
+- [x] Email and username uniqueness checks
 - [ ] User authentication (JWT with refresh tokens)
 - [ ] Task CRUD operations
 - [ ] Advanced filtering and pagination
@@ -41,18 +44,19 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 
 **Framework & Libraries:**
 - Express.js - Web framework
-- Prisma - ORM for PostgreSQL
+- Prisma 5.22 - ORM for PostgreSQL
 - Zod - Schema validation
 - JWT - Authentication
 - Bcrypt - Password hashing
+- JWT - Authentication (coming soon)
 
 **Database:**
 - PostgreSQL - Primary database
-- Redis - Caching layer
+- Redis - Caching layer (coming soon)
 
 **Testing:**
-- Jest - Testing framework
-- Supertest - API testing
+- Jest - Testing framework (coming soon)
+- Supertest - API testing (coming soon)
 
 **DevOps:**
 - pnpm - Package manager
@@ -63,106 +67,24 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 
 task-management-api/
 ├── src/
+│   ├── config/           # Configuration (database, etc.)
 │   ├── controllers/      # Request handlers
 │   ├── services/         # Business logic
 │   ├── repositories/     # Data access layer
-│   ├── models/           # Data models
+│   ├── dtos/             # Data Transfer Objects
+│   ├── schemas/          # Zod validation schemas
 │   ├── routes/           # API routes
 │   ├── middleware/       # Custom middleware
-│   ├── config/           # Configuration files
+│   ├── errors/           # Custom error classes
 │   ├── types/            # TypeScript type definitions
 │   └── utils/            # Helper functions
+├── prisma/
+│   ├── migrations/       # Database migrations
+│   └── schema.prisma     # Database schema
 ├── tests/
 │   ├── unit/             # Unit tests
 │   └── integration/      # Integration tests
-├── docs/                 # API documentation
-└── prisma/               # Database schema & migrations
-
-📝 Excelente ideia! Vamos criar um README profissional!
-Um bom README é essencial para qualquer projeto, especialmente para o teu portfólio!
-
-🎯 Criar README.md
-Cria o ficheiro README.md na raiz do projeto:
-bashtouch README.md
-
-📄 Conteúdo do README (copia e adapta)
-markdown# Task Management API
-
-> A production-ready RESTful API built with TypeScript, Express, and PostgreSQL as part of a backend development learning journey.
-
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue.svg)](https://www.typescriptlang.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-20.x-green.svg)](https://nodejs.org/)
-[![Express](https://img.shields.io/badge/Express-4.x-lightgrey.svg)](https://expressjs.com/)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-
-## 📋 About
-
-This project is a comprehensive **Task Management API** developed as part of a 12-week backend development learning program. It demonstrates professional-grade backend development practices including:
-
-- RESTful API design
-- TypeScript for type safety
-- Authentication & Authorization (JWT)
-- Database design with PostgreSQL & Prisma ORM
-- Redis caching
-- Comprehensive testing (Unit & Integration)
-- Production deployment strategies
-
-## 🚀 Features
-
-- [ ] User authentication (JWT with refresh tokens)
-- [ ] Task CRUD operations
-- [ ] Advanced filtering and pagination
-- [ ] File attachments
-- [ ] Rate limiting
-- [ ] Redis caching
-- [ ] Role-based access control
-- [ ] Comprehensive API documentation (Swagger)
-
-## 🛠️ Tech Stack
-
-**Runtime & Language:**
-- Node.js v20+
-- TypeScript 5.9
-
-**Framework & Libraries:**
-- Express.js - Web framework
-- Prisma - ORM for PostgreSQL
-- Zod - Schema validation
-- JWT - Authentication
-- Bcrypt - Password hashing
-
-**Database:**
-- PostgreSQL - Primary database
-- Redis - Caching layer
-
-**Testing:**
-- Jest - Testing framework
-- Supertest - API testing
-
-**DevOps:**
-- pnpm - Package manager
-- ESLint & Prettier - Code quality
-- ts-node-dev - Development server
-
-## 📁 Project Structure
-```
-task-management-api/
-├── src/
-│   ├── controllers/      # Request handlers
-│   ├── services/         # Business logic
-│   ├── repositories/     # Data access layer
-│   ├── models/           # Data models
-│   ├── routes/           # API routes
-│   ├── middleware/       # Custom middleware
-│   ├── config/           # Configuration files
-│   ├── types/            # TypeScript type definitions
-│   └── utils/            # Helper functions
-├── tests/
-│   ├── unit/             # Unit tests
-│   └── integration/      # Integration tests
-├── docs/                 # API documentation
-└── prisma/               # Database schema & migrations
-```
+└── docs/                 # API documentation
 
 ## 🏃 Getting Started
 
@@ -171,14 +93,13 @@ task-management-api/
 - Node.js v20 or higher
 - pnpm v8 or higher
 - PostgreSQL v14 or higher
-- Redis v7 or higher (optional for caching)
 
 ### Installation
 
 1. **Clone the repository**
 ```bash
-   git clone https://github.com/mirandaftiago/task-management-api.git
-   cd task-management-api
+   git clone https://github.com/mirandaftiago/backend-portfolio.git
+   cd backend-portfolio
 ```
 
 2. **Install dependencies**
@@ -189,7 +110,7 @@ task-management-api/
 3. **Set up environment variables**
 ```bash
    cp .env.example .env
-   # Edit .env with your configuration
+   # Edit .env with your database credentials
 ```
 
 4. **Run database migrations**
@@ -206,17 +127,17 @@ The API will be available at `http://localhost:3000`
 
 ## 🧪 Testing
 ```bash
-# Run all tests
-pnpm test
+# Health check
+curl http://localhost:3000/health
 
-# Run unit tests
-pnpm test:unit
-
-# Run integration tests
-pnpm test:integration
-
-# Test coverage
-pnpm test:coverage
+# Register new user
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "johndoe",
+    "email": "john@example.com",
+    "password": "SecurePass123"
+  }'
 ```
 
 ## 📝 Available Scripts
@@ -228,6 +149,8 @@ pnpm run lint         # Lint code
 pnpm run lint:fix     # Fix linting issues
 pnpm run format       # Format code with Prettier
 pnpm run type-check   # Type check without emitting files
+pnpm db:migrate       # Run database migrations
+pnpm db:studio        # Open Prisma Studio (database GUI)
 ```
 
 ## 🔐 Environment Variables
@@ -238,43 +161,84 @@ NODE_ENV=development
 PORT=3000
 
 # Database
-DATABASE_URL=postgresql://user:password@localhost:5432/taskdb
-
-# JWT
-JWT_SECRET=your-secret-key
-JWT_REFRESH_SECRET=your-refresh-secret
-JWT_EXPIRES_IN=15m
-JWT_REFRESH_EXPIRES_IN=7d
-
-# Redis (optional)
-REDIS_URL=redis://localhost:6379
+DATABASE_URL=postgresql://user:password@localhost:5432/taskdb?schema=public
 ```
 
 ## 📚 API Documentation
 
-API documentation will be available at `/api-docs` when running the server (coming soon with Swagger).
+### Authentication Endpoints
 
-### Example Endpoints
+#### Register User
+```http
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "username": "johndoe",
+  "email": "john@example.com",
+  "password": "SecurePass123"
+}
 ```
-POST   /api/auth/register      # Register new user
-POST   /api/auth/login         # Login user
-POST   /api/auth/refresh       # Refresh access token
 
-GET    /api/tasks              # Get all tasks (paginated)
-POST   /api/tasks              # Create new task
-GET    /api/tasks/:id          # Get task by ID
-PATCH  /api/tasks/:id          # Update task
-DELETE /api/tasks/:id          # Delete task
+**Response (201 Created):**
+```json
+{
+  "message": "User registered successfully",
+  "data": {
+    "id": "uuid",
+    "username": "johndoe",
+    "email": "john@example.com",
+    "createdAt": "2026-02-09T00:00:00.000Z",
+    "updatedAt": "2026-02-09T00:00:00.000Z"
+  }
+}
+```
+
+**Validation Rules:**
+- Username: 3-20 characters, alphanumeric + underscore only
+- Email: Valid email format
+- Password: Min 8 characters, must contain uppercase, lowercase, and number
+
+### Health Check
+```http
+GET /health
+```
+
+**Response (200 OK):**
+```json
+{
+  "status": "healthy",
+  "timestamp": "2026-02-09T00:00:00.000Z",
+  "uptime": 123.45,
+  "environment": "development"
+}
 ```
 
 ## 🚧 Project Status
 
-This project is currently in **Phase 1** of development:
+This project is currently in **Phase 2** of development:
 
 - [x] Phase 1: Foundation & TypeScript Setup
-- [ ] Phase 2: Database & User Management
-   - [x] Phase 2.1: Prisma Setup & Database Schema (in progress)
-   - [ ] Phase 2.2: User Registration
+  - [x] TypeScript configuration
+  - [x] Express.js setup
+  - [x] ESLint & Prettier
+  - [x] Project structure
+  - [x] Health check endpoint
+
+- [x] Phase 2.1: Prisma Setup & Database Schema
+  - [x] Prisma ORM integration
+  - [x] PostgreSQL connection
+  - [x] User model with migrations
+  - [x] Database configuration
+
+- [x] Phase 2.2: User Registration
+  - [x] Zod validation schemas
+  - [x] Bcrypt password hashing
+  - [x] Layered architecture (Controller/Service/Repository)
+  - [x] Custom error handling
+  - [x] DTOs for safe responses
+
+- [ ] Phase 2.3: User Login & JWT Authentication (next)
 - [ ] Phase 3: Task Management & Authorization
 - [ ] Phase 4: Advanced Features & Performance
 - [ ] Phase 5: Testing & Quality Assurance
@@ -288,8 +252,14 @@ This project demonstrates understanding of:
 - ✅ RESTful API architecture
 - ✅ Prisma ORM and database migrations
 - ✅ PostgreSQL setup and configuration
-- ⏳ Authentication & Authorization patterns
-- ⏳ Error handling and validation
+- ✅ Input validation with Zod
+- ✅ Password security (bcrypt hashing)
+- ✅ Layered architecture patterns
+- ✅ Repository pattern for data access
+- ✅ Service layer for business logic
+- ✅ DTOs for safe data transfer
+- ✅ Custom error handling
+- ⏳ JWT authentication (in progress)
 - ⏳ Testing strategies (TDD)
 - ⏳ Production deployment
 
@@ -306,15 +276,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Tiago Miranda**
 
 - GitHub: [@mirandaftiago](https://github.com/mirandaftiago)
-- Project: [Task Management API](https://github.com/mirandaftiago/backend-portfolio.git)
+- Project: [Backend Portfolio](https://github.com/mirandaftiago/backend-portfolio)
 - Email: miranda.f.tiago@gmail.com
-- Linkedin: https://www.linkedin.com/in/tiagofilipemiranda/
+- LinkedIn: [tiagofilipemiranda](https://www.linkedin.com/in/tiagofilipemiranda/)
 
 ## 🙏 Acknowledgments
 
 - Built as part of a structured backend development learning program
 - Inspired by production-grade API architectures
-- Thanks to the TypeScript and Node.js communities
+- Thanks to the TypeScript, Node.js, and Prisma communities
 
 ---
 
