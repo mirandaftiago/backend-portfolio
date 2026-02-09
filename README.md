@@ -33,7 +33,11 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 - [x] Token refresh endpoint
 - [x] Logout endpoint
 - [x] Protected routes with authentication middleware
-- [ ] Task CRUD operations
+- [x] Task CRUD operations
+- [x] Task filtering (status, priority, search, date range)
+- [x] Pagination and sorting
+- [x] Task statistics endpoint
+- [x] Ownership-based authorization
 - [ ] Advanced filtering and pagination
 - [ ] File attachments
 - [ ] Rate limiting
@@ -141,6 +145,25 @@ curl -X POST http://localhost:3000/api/auth/register \
     "username": "johndoe",
     "email": "john@example.com",
     "password": "SecurePass123"
+  }'
+
+# Login
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john@example.com",
+    "password": "SecurePass123"
+  }'
+
+# Create task (requires authentication)
+curl -X POST http://localhost:3000/api/tasks \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -d '{
+    "title": "My first task",
+    "description": "This is a test task",
+    "priority": "HIGH",
+    "status": "TODO"
   }'
 ```
 
@@ -303,6 +326,203 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
 }
 ```
 
+---
+
+### Task Endpoints (All Protected)
+
+#### Create Task
+```http
+POST /api/tasks
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+Content-Type: application/json
+
+{
+  "title": "Complete project documentation",
+  "description": "Write comprehensive API documentation",
+  "priority": "HIGH",
+  "status": "TODO",
+  "dueDate": "2026-02-15T10:00:00.000Z"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "message": "Task created successfully",
+  "data": {
+    "id": "uuid",
+    "title": "Complete project documentation",
+    "description": "Write comprehensive API documentation",
+    "status": "TODO",
+    "priority": "HIGH",
+    "dueDate": "2026-02-15T10:00:00.000Z",
+    "userId": "uuid",
+    "createdAt": "2026-02-09T00:00:00.000Z",
+    "updatedAt": "2026-02-09T00:00:00.000Z"
+  }
+}
+```
+
+**Enums:**
+- Status: `TODO`, `IN_PROGRESS`, `COMPLETED`
+- Priority: `LOW`, `MEDIUM`, `HIGH`, `URGENT`
+
+---
+
+#### Get All Tasks
+```http
+GET /api/tasks?page=1&pageSize=10&status=TODO&priority=HIGH&sortBy=createdAt&sortOrder=desc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+```
+
+**Query Parameters:**
+- `page` (optional): Page number (default: 1)
+- `pageSize` (optional): Items per page (default: 10, max: 100)
+- `status` (optional): Filter by status (`TODO`, `IN_PROGRESS`, `COMPLETED`)
+- `priority` (optional): Filter by priority (`LOW`, `MEDIUM`, `HIGH`, `URGENT`)
+- `search` (optional): Search in title and description
+- `sortBy` (optional): Sort field (`createdAt`, `dueDate`, `priority`, `title`)
+- `sortOrder` (optional): Sort direction (`asc`, `desc`)
+- `dueDateFrom` (optional): Filter tasks from date (ISO 8601)
+- `dueDateTo` (optional): Filter tasks until date (ISO 8601)
+
+**Response (200 OK):**
+```json
+{
+  "message": "Tasks retrieved successfully",
+  "data": [
+    {
+      "id": "uuid",
+      "title": "Complete project documentation",
+      "description": "Write comprehensive API documentation",
+      "status": "TODO",
+      "priority": "HIGH",
+      "dueDate": "2026-02-15T10:00:00.000Z",
+      "userId": "uuid",
+      "createdAt": "2026-02-09T00:00:00.000Z",
+      "updatedAt": "2026-02-09T00:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "pageSize": 10,
+    "total": 1,
+    "totalPages": 1
+  }
+}
+```
+
+---
+
+#### Get Task by ID
+```http
+GET /api/tasks/:id
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Task retrieved successfully",
+  "data": {
+    "id": "uuid",
+    "title": "Complete project documentation",
+    "description": "Write comprehensive API documentation",
+    "status": "TODO",
+    "priority": "HIGH",
+    "dueDate": "2026-02-15T10:00:00.000Z",
+    "userId": "uuid",
+    "createdAt": "2026-02-09T00:00:00.000Z",
+    "updatedAt": "2026-02-09T00:00:00.000Z"
+  }
+}
+```
+
+---
+
+#### Update Task
+```http
+PATCH /api/tasks/:id
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+Content-Type: application/json
+
+{
+  "status": "IN_PROGRESS",
+  "priority": "URGENT"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Task updated successfully",
+  "data": {
+    "id": "uuid",
+    "title": "Complete project documentation",
+    "description": "Write comprehensive API documentation",
+    "status": "IN_PROGRESS",
+    "priority": "URGENT",
+    "dueDate": "2026-02-15T10:00:00.000Z",
+    "userId": "uuid",
+    "createdAt": "2026-02-09T00:00:00.000Z",
+    "updatedAt": "2026-02-09T01:00:00.000Z"
+  }
+}
+```
+
+---
+
+#### Delete Task
+```http
+DELETE /api/tasks/:id
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Task deleted successfully"
+}
+```
+
+---
+
+#### Get Task Statistics
+```http
+GET /api/tasks/stats
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Task statistics retrieved successfully",
+  "data": {
+    "total": 10,
+    "todo": 3,
+    "inProgress": 5,
+    "completed": 2
+  }
+}
+```
+
+---
+
+### Health Check
+```http
+GET /health
+```
+
+**Response (200 OK):**
+```json
+{
+  "status": "healthy",
+  "timestamp": "2026-02-09T00:00:00.000Z",
+  "uptime": 123.45,
+  "environment": "development"
+}
+```
+
 ## 🚧 Project Status
 
 This project is currently in **Phase 2** of development:
@@ -336,7 +556,21 @@ This project is currently in **Phase 2** of development:
   - [x] Protected routes
   - [x] Refresh token storage in database
 
-- [ ] Phase 3: Task Management & Authorization
+- [x] Phase 3: Task Management & Authorization
+  - [x] Phase 3.1: Task Model & Repository
+    - [x] Task model with Status and Priority enums
+    - [x] Database relationships (User 1:N Tasks)
+    - [x] Cascade delete (user -> tasks)
+    - [x] Database indexes for performance
+    - [x] Task repository with CRUD operations
+    - [x] Task filtering and pagination
+    - [x] Task statistics
+    - [x] Ownership-based authorization
+
+  - [ ] Phase 3.2: Advanced Querying & Filtering
+  - [ ] Phase 3.3: Authorization Middleware & Policies
+  - [ ] Phase 3.4: Task Sharing & Collaboration
+
 - [ ] Phase 4: Advanced Features & Performance
 - [ ] Phase 5: Testing & Quality Assurance
 - [ ] Phase 6: Production Ready & Deployment
@@ -360,6 +594,12 @@ This project demonstrates understanding of:
 - ✅ Access and refresh token patterns
 - ✅ Token rotation for security
 - ✅ Protected route middleware
+- ✅ Database relationships (1:N)
+- ✅ Enums for data consistency
+- ✅ Database indexes for performance
+- ✅ Cascade delete operations
+- ✅ Ownership-based authorization
+- ✅ Pagination and filtering
 - ⏳ Testing strategies (TDD)
 - ⏳ Production deployment
 
