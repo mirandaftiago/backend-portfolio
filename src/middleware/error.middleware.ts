@@ -1,11 +1,19 @@
 // src/middleware/error.middleware.ts
 
 import { Request, Response, NextFunction } from 'express';
-import { ErrorResponse } from '../types/express.types';
+import { AppError } from '../errors/app-errors';
+
+interface ErrorResponse {
+  error: {
+    message: string;
+    status: number;
+    timestamp: string;
+    errors?: any;
+  };
+}
 
 /**
  * Global error handling middleware
- * Catches all errors and returns consistent error response
  */
 export const errorHandler = (
   err: Error,
@@ -13,12 +21,31 @@ export const errorHandler = (
   res: Response<ErrorResponse>,
   _next: NextFunction
 ): void => {
+  // Log error
   console.error('Error:', err.message);
-  console.error('Stack:', err.stack);
+  if (!(err instanceof AppError)) {
+    console.error('Stack:', err.stack);
+  }
 
+  // Handle AppError (known errors)
+  if (err instanceof AppError) {
+    const errorResponse: ErrorResponse = {
+      error: {
+        message: err.message,
+        status: err.statusCode,
+        timestamp: new Date().toISOString(),
+        ...(err instanceof Error && 'errors' in err && { errors: (err as any).errors }),
+      },
+    };
+    
+    res.status(err.statusCode).json(errorResponse);
+    return;
+  }
+
+  // Handle unknown errors
   const errorResponse: ErrorResponse = {
     error: {
-      message: err.message || 'Internal Server Error',
+      message: 'Internal Server Error',
       status: 500,
       timestamp: new Date().toISOString(),
     },
@@ -29,7 +56,6 @@ export const errorHandler = (
 
 /**
  * 404 Not Found handler
- * Catches requests to undefined routes
  */
 export const notFoundHandler = (
   req: Request,

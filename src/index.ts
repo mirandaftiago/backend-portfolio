@@ -3,6 +3,7 @@
 import 'dotenv/config';
 import express, { Application } from 'express';
 import healthRoutes from './routes/health.routes';
+import authRoutes from './routes/auth.routes';
 import { errorHandler, notFoundHandler } from './middleware/error.middleware';
 
 // Initialize Express app
@@ -13,16 +14,17 @@ const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Middleware
-app.use(express.json()); // Parse JSON bodies
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use(healthRoutes); // Health check route
+app.use(healthRoutes);
+app.use('/api/auth', authRoutes);
 
-// 404 handler (must be after all routes)
+// 404 handler
 app.use(notFoundHandler);
 
-// Error handler (must be last)
+// Error handler
 app.use(errorHandler);
 
 // Start server
@@ -31,4 +33,5 @@ app.listen(PORT, () => {
   console.log(`📡 Environment: ${NODE_ENV}`);
   console.log(`🔗 Server running on: http://localhost:${PORT}`);
   console.log(`💚 Health check: http://localhost:${PORT}/health`);
+  console.log(`🔐 Auth endpoint: http://localhost:${PORT}/api/auth/register`);
 });
