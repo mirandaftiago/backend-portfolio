@@ -9,15 +9,11 @@ import { ValidationError } from '../errors/app-errors';
  * Register new user
  * @route POST /api/auth/register
  */
-export const register = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
+export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     // Validate request body
     const result = registerSchema.safeParse(req.body);
-    
+
     if (!result.success) {
       throw new ValidationError('Validation failed', result.error.issues);
     }
@@ -39,15 +35,11 @@ export const register = async (
  * Login user
  * @route POST /api/auth/login
  */
-export const login = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
+export const login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     // Validate request body
     const result = loginSchema.safeParse(req.body);
-    
+
     if (!result.success) {
       throw new ValidationError('Validation failed', result.error.issues);
     }
@@ -69,11 +61,7 @@ export const login = async (
  * Refresh access token
  * @route POST /api/auth/refresh
  */
-export const refresh = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
+export const refresh = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { refreshToken } = req.body;
 
@@ -98,11 +86,7 @@ export const refresh = async (
  * Logout user
  * @route POST /api/auth/logout
  */
-export const logout = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
+export const logout = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { refreshToken } = req.body;
 
@@ -130,7 +114,7 @@ export const logout = async (
 export const getProfile = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     // User is already attached by authenticate middleware

@@ -19,7 +19,7 @@ export const errorHandler = (
   err: Error,
   _req: Request,
   res: Response<ErrorResponse>,
-  _next: NextFunction
+  _next: NextFunction,
 ): void => {
   // Log error
   console.error('Error:', err.message);
@@ -37,7 +37,7 @@ export const errorHandler = (
         ...(err instanceof Error && 'errors' in err && { errors: (err as any).errors }),
       },
     };
-    
+
     res.status(err.statusCode).json(errorResponse);
     return;
   }
@@ -57,10 +57,7 @@ export const errorHandler = (
 /**
  * 404 Not Found handler
  */
-export const notFoundHandler = (
-  req: Request,
-  res: Response<ErrorResponse>
-): void => {
+export const notFoundHandler = (req: Request, res: Response<ErrorResponse>): void => {
   const errorResponse: ErrorResponse = {
     error: {
       message: `Route ${req.method} ${req.url} not found`,

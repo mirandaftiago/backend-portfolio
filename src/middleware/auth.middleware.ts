@@ -9,6 +9,7 @@ import { DecodedJWT } from '../dtos/auth.dto';
  * Extend Express Request to include user
  */
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
       user?: DecodedJWT;
@@ -20,11 +21,7 @@ declare global {
  * Authentication middleware
  * Verifies JWT access token and attaches user to request
  */
-export const authenticate = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
+export const authenticate = (req: Request, _res: Response, next: NextFunction): void => {
   try {
     // Get token from Authorization header
     const authHeader = req.headers.authorization;

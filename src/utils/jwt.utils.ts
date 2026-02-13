@@ -51,7 +51,7 @@ export const verifyRefreshToken = (token: string): DecodedJWT => {
 export const getTokenExpirationDate = (expiresIn: string): Date => {
   const now = new Date();
   const match = expiresIn.match(/^(\d+)([smhd])$/);
-  
+
   if (!match) {
     throw new Error('Invalid expiration format');
   }

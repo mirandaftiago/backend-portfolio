@@ -96,7 +96,7 @@ export class AuthService {
     let decoded: JWTPayload;
     try {
       decoded = verifyRefreshToken(token);
-    } catch (error) {
+    } catch (_error) {
       throw new UnauthorizedError('Invalid refresh token');
     }
 
