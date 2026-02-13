@@ -72,6 +72,7 @@ export class AuthService {
     const payload: JWTPayload = {
       userId: user.id,
       email: user.email,
+      role: user.role,
     };
 
     const accessToken = generateAccessToken(payload);
@@ -117,6 +118,7 @@ export class AuthService {
     const payload: JWTPayload = {
       userId: decoded.userId,
       email: decoded.email,
+      role: decoded.role,
     };
 
     const newAccessToken = generateAccessToken(payload);

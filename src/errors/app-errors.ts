@@ -55,3 +55,12 @@ export class UnauthorizedError extends AppError {
     super(401, message);
   }
 }
+
+/**
+ * 403 - Forbidden
+ */
+export class ForbiddenError extends AppError {
+  constructor(message: string = 'Forbidden') {
+    super(403, message);
+  }
+}

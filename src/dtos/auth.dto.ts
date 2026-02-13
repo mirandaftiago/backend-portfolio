@@ -1,5 +1,6 @@
 // src/dtos/auth.dto.ts
 
+import { Role } from '@prisma/client';
 import { UserResponseDTO } from './user.dto';
 
 /**
@@ -25,6 +26,7 @@ export interface RefreshResponseDTO {
 export interface JWTPayload {
   userId: string;
   email: string;
+  role: Role;
 }
 
 /**
@@ -33,4 +35,5 @@ export interface JWTPayload {
 export interface DecodedJWT extends JWTPayload {
   iat: number;
   exp: number;
+  role: Role;
 }

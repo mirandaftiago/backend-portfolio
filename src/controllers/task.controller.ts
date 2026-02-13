@@ -47,7 +47,8 @@ export const createTask = async (
 export const getTasks = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const userId = req.user?.userId;
-    if (!userId) {
+    const role = req.user?.role;
+    if (!userId || !role) {
       throw new ValidationError('User not authenticated');
     }
 
@@ -58,7 +59,7 @@ export const getTasks = async (req: Request, res: Response, next: NextFunction):
     }
 
     // Get tasks
-    const tasks = await taskService.getTasks(userId, result.data);
+    const tasks = await taskService.getTasks(userId, role, result.data);
 
     res.status(200).json({
       message: 'Tasks retrieved successfully',

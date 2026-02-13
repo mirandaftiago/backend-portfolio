@@ -33,7 +33,7 @@ export class TaskRepository {
    * Find all tasks for a user with filters and pagination
    */
   async findAllByUser(
-    userId: string,
+    userId: string | undefined,
     filters: TaskFilters = {},
     pagination: PaginationParams = {},
   ): Promise<{ tasks: Task[]; total: number }> {
@@ -42,7 +42,7 @@ export class TaskRepository {
     const { page = 1, pageSize = 10, sortBy = 'createdAt', sortOrder = 'desc' } = pagination;
 
     // Build where clause
-    const where: Prisma.TaskWhereInput = { userId };
+    const where: Prisma.TaskWhereInput = userId ? { userId } : {};
 
     if (status) {
       where.status = status;

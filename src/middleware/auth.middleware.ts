@@ -4,6 +4,8 @@ import { Request, Response, NextFunction } from 'express';
 import { UnauthorizedError } from '../errors/app-errors';
 import { verifyAccessToken } from '../utils/jwt.utils';
 import { DecodedJWT } from '../dtos/auth.dto';
+import { ForbiddenError } from '../errors/app-errors';
+import { Role } from '@prisma/client';
 
 /**
  * Extend Express Request to include user
@@ -56,4 +58,14 @@ export const authenticate = (req: Request, _res: Response, next: NextFunction): 
       next(new UnauthorizedError('Invalid or expired token'));
     }
   }
+};
+
+export const requireRole = (...roles: Role[]) => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
+    const userRole = req.user?.role;
+    if (!userRole || !roles.includes(userRole)) {
+      throw new ForbiddenError('Insufficient permissions');
+    }
+    next();
+  };
 };

@@ -4,7 +4,7 @@ import { CreateTaskDTO, UpdateTaskDTO, QueryTasksDTO } from '../schemas/task.sch
 import { TaskResponseDTO, PaginatedTasksDTO, UpdateTaskData, TaskStatsDTO } from '../dtos/task.dto';
 import { taskRepository } from '../repositories/task.repository';
 import { NotFoundError } from '../errors/app-errors';
-import { Task } from '@prisma/client';
+import { Role, Task } from '@prisma/client';
 
 /**
  * Task service - handles business logic
@@ -25,7 +25,7 @@ export class TaskService {
   /**
    * Get all tasks for user with filters and pagination
    */
-  async getTasks(userId: string, query: QueryTasksDTO): Promise<PaginatedTasksDTO> {
+  async getTasks(userId: string, role: Role, query: QueryTasksDTO): Promise<PaginatedTasksDTO> {
     const {
       page = 1,
       pageSize = 10,
@@ -55,7 +55,13 @@ export class TaskService {
       sortOrder,
     };
 
-    const { tasks, total } = await taskRepository.findAllByUser(userId, filters, pagination);
+    const effectiveUserId = role === 'ADMIN' ? undefined : userId;
+
+    const { tasks, total } = await taskRepository.findAllByUser(
+      effectiveUserId,
+      filters,
+      pagination,
+    );
 
     const totalPages = Math.ceil(total / pageSize);
 
