@@ -1,5 +1,7 @@
 // src/errors/app-errors.ts
 
+import { ZodIssue } from 'zod';
+
 /**
  * Base application error class
  */
@@ -21,7 +23,7 @@ export class AppError extends Error {
 export class ValidationError extends AppError {
   constructor(
     message: string = 'Validation failed',
-    public errors?: any,
+    public errors?: ZodIssue[],
   ) {
     super(400, message);
   }

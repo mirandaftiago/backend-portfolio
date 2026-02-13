@@ -1,14 +1,15 @@
 // src/middleware/error.middleware.ts
 
 import { Request, Response, NextFunction } from 'express';
-import { AppError } from '../errors/app-errors';
+import { AppError, ValidationError } from '../errors/app-errors';
+import { ZodIssue } from 'zod';
 
 interface ErrorResponse {
   error: {
     message: string;
     status: number;
     timestamp: string;
-    errors?: any;
+    errors?: ZodIssue[];
   };
 }
 
@@ -34,7 +35,7 @@ export const errorHandler = (
         message: err.message,
         status: err.statusCode,
         timestamp: new Date().toISOString(),
-        ...(err instanceof Error && 'errors' in err && { errors: (err as any).errors }),
+        ...(err instanceof ValidationError && err.errors && { errors: err.errors }),
       },
     };
 
