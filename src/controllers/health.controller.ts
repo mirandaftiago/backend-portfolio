@@ -7,10 +7,7 @@ import { HealthResponse } from '../types/express.types';
  * Health check endpoint controller
  * Returns API health status
  */
-export const healthCheck = (
-  _req: Request,
-  res: Response<HealthResponse>
-): void => {
+export const healthCheck = (_req: Request, res: Response<HealthResponse>): void => {
   const healthData: HealthResponse = {
     status: 'healthy',
     timestamp: new Date().toISOString(),

@@ -1,14 +1,15 @@
 // src/middleware/error.middleware.ts
 
 import { Request, Response, NextFunction } from 'express';
-import { AppError } from '../errors/app-errors';
+import { AppError, ValidationError } from '../errors/app-errors';
+import { ZodIssue } from 'zod';
 
 interface ErrorResponse {
   error: {
     message: string;
     status: number;
     timestamp: string;
-    errors?: any;
+    errors?: ZodIssue[];
   };
 }
 
@@ -19,7 +20,7 @@ export const errorHandler = (
   err: Error,
   _req: Request,
   res: Response<ErrorResponse>,
-  _next: NextFunction
+  _next: NextFunction,
 ): void => {
   // Log error
   console.error('Error:', err.message);
@@ -34,10 +35,10 @@ export const errorHandler = (
         message: err.message,
         status: err.statusCode,
         timestamp: new Date().toISOString(),
-        ...(err instanceof Error && 'errors' in err && { errors: (err as any).errors }),
+        ...(err instanceof ValidationError && err.errors && { errors: err.errors }),
       },
     };
-    
+
     res.status(err.statusCode).json(errorResponse);
     return;
   }
@@ -57,10 +58,7 @@ export const errorHandler = (
 /**
  * 404 Not Found handler
  */
-export const notFoundHandler = (
-  req: Request,
-  res: Response<ErrorResponse>
-): void => {
+export const notFoundHandler = (req: Request, res: Response<ErrorResponse>): void => {
   const errorResponse: ErrorResponse = {
     error: {
       message: `Route ${req.method} ${req.url} not found`,

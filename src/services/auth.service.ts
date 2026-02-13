@@ -13,6 +13,7 @@ import {
   verifyRefreshToken,
   getTokenExpirationDate,
 } from '../utils/jwt.utils';
+import { User } from '@prisma/client';
 
 const SALT_ROUNDS = 10;
 const REFRESH_TOKEN_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
@@ -96,7 +97,7 @@ export class AuthService {
     let decoded: JWTPayload;
     try {
       decoded = verifyRefreshToken(token);
-    } catch (error) {
+    } catch (_error) {
       throw new UnauthorizedError('Invalid refresh token');
     }
 
@@ -149,7 +150,7 @@ export class AuthService {
   /**
    * Transform User model to UserResponseDTO
    */
-  private toUserResponseDTO(user: any): UserResponseDTO {
+  private toUserResponseDTO(user: User): UserResponseDTO {
     return {
       id: user.id,
       username: user.username,

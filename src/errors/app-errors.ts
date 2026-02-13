@@ -1,5 +1,7 @@
 // src/errors/app-errors.ts
 
+import { ZodIssue } from 'zod';
+
 /**
  * Base application error class
  */
@@ -8,7 +10,7 @@ export class AppError extends Error {
     public statusCode: number,
     public message: string,
     public isOperational: boolean = true,
-  ){
+  ) {
     super(message);
     Object.setPrototypeOf(this, AppError.prototype);
   }
@@ -19,7 +21,10 @@ export class AppError extends Error {
  */
 
 export class ValidationError extends AppError {
-  constructor(message: string = 'Validation failed', public errors?: any) {
+  constructor(
+    message: string = 'Validation failed',
+    public errors?: ZodIssue[],
+  ) {
     super(400, message);
   }
 }

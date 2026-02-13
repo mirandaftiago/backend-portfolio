@@ -1,7 +1,7 @@
 // src/repositories/refresh-token.repository.ts
 
 import prisma from '../config/database';
-import { RefreshToken } from '@prisma/client';
+import { Prisma, RefreshToken } from '@prisma/client';
 
 /**
  * RefreshToken repository - handles refresh token data access
@@ -37,11 +37,11 @@ export class RefreshTokenRepository {
       await prisma.refreshToken.delete({
         where: { token },
       });
-    } catch (error: any) {
-      // Ignore "not found" errors
-      if (error.code !== 'P2025') {
-        throw error;
+    } catch (error: unknown) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        return; // Record not found — ignore it
       }
+      throw error;
     }
   }
 
