@@ -4,7 +4,7 @@
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-20.x-green.svg)](https://nodejs.org/)
-[![Express](https://img.shields.io/badge/Express-4.x-lightgrey.svg)](https://expressjs.com/)
+[![Express](https://img.shields.io/badge/Express-5.x-lightgrey.svg)](https://expressjs.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14+-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/Redis-7+-red.svg)](https://redis.io/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -33,12 +33,13 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 - [x] Token refresh endpoint
 - [x] Logout endpoint
 - [x] Protected routes with authentication middleware
-- [ ] Task CRUD operations
-- [ ] Advanced filtering and pagination
+- [X] Task CRUD operations
+- [X] Advanced filtering and pagination
+- [X] Role-based access control
+- [x] Task sharing & collaboration
 - [ ] File attachments
 - [ ] Rate limiting
 - [ ] Redis caching
-- [ ] Role-based access control
 - [ ] Comprehensive API documentation (Swagger)
 
 ## 🛠️ Tech Stack
@@ -176,6 +177,8 @@ JWT_REFRESH_EXPIRES_IN=7d
 
 ## 📚 API Documentation
 
+> All protected endpoints require the `Authorization: Bearer <token>` header.
+
 ### Authentication Endpoints
 
 #### Register User
@@ -287,7 +290,7 @@ Content-Type: application/json
 #### Get Current User (Protected)
 ```http
 GET /api/auth/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+Authorization: Bearer <token>
 ```
 
 **Response (200 OK):**
@@ -303,9 +306,304 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
 }
 ```
 
+---
+
+### Task Endpoints (Protected)
+
+#### Create Task
+```http
+POST /api/tasks
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "title": "My new task",
+  "description": "Optional description",
+  "priority": "HIGH",
+  "status": "TODO",
+  "dueDate": "2026-03-01T00:00:00.000Z"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "message": "Task created successfully",
+  "data": {
+    "id": "uuid",
+    "title": "My new task",
+    "description": "Optional description",
+    "status": "TODO",
+    "priority": "HIGH",
+    "dueDate": "2026-03-01T00:00:00.000Z",
+    "userId": "uuid",
+    "createdAt": "2026-02-14T00:00:00.000Z",
+    "updatedAt": "2026-02-14T00:00:00.000Z",
+    "completedAt": null
+  }
+}
+```
+
+**Fields:**
+- `title` (required): Task title
+- `description` (optional): Task description
+- `priority` (optional): `LOW`, `MEDIUM`, `HIGH`, `URGENT` (default: `MEDIUM`)
+- `status` (optional): `TODO`, `IN_PROGRESS`, `COMPLETED` (default: `TODO`)
+- `dueDate` (optional): ISO 8601 date string
+
+---
+
+#### List Tasks
+```http
+GET /api/tasks?status=TODO&priority=HIGH&search=meeting&page=1&pageSize=10&sortBy=createdAt&sortOrder=desc
+Authorization: Bearer <token>
+```
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `status` | string | Filter by status: `TODO`, `IN_PROGRESS`, `COMPLETED` |
+| `priority` | string | Filter by priority: `LOW`, `MEDIUM`, `HIGH`, `URGENT` |
+| `search` | string | Search in title and description |
+| `dueDateFrom` | ISO date | Tasks due after this date |
+| `dueDateTo` | ISO date | Tasks due before this date |
+| `overdue` | boolean | Only overdue tasks |
+| `page` | number | Page number (default: 1) |
+| `pageSize` | number | Items per page (default: 10) |
+| `sortBy` | string | Sort field: `createdAt`, `dueDate`, `priority`, `title` |
+| `sortOrder` | string | `asc` or `desc` (default: `desc`) |
+
+**Response (200 OK):**
+```json
+{
+  "message": "Tasks retrieved successfully",
+  "data": [ ... ],
+  "pagination": {
+    "page": 1,
+    "pageSize": 10,
+    "total": 25,
+    "totalPages": 3
+  }
+}
+```
+
+> ADMIN users can see all tasks. Regular users only see their own.
+
+---
+
+#### Get Task by ID
+```http
+GET /api/tasks/:id
+Authorization: Bearer <token>
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Task retrieved successfully",
+  "data": {
+    "id": "uuid",
+    "title": "My task",
+    "description": null,
+    "status": "TODO",
+    "priority": "MEDIUM",
+    "dueDate": null,
+    "userId": "uuid",
+    "createdAt": "2026-02-14T00:00:00.000Z",
+    "updatedAt": "2026-02-14T00:00:00.000Z",
+    "completedAt": null
+  }
+}
+```
+
+---
+
+#### Update Task
+```http
+PATCH /api/tasks/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "title": "Updated title",
+  "status": "IN_PROGRESS",
+  "priority": "URGENT"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Task updated successfully",
+  "data": { ... }
+}
+```
+
+---
+
+#### Delete Task
+```http
+DELETE /api/tasks/:id
+Authorization: Bearer <token>
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Task deleted successfully"
+}
+```
+
+---
+
+#### Get Task Statistics
+```http
+GET /api/tasks/stats
+Authorization: Bearer <token>
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Task statistics retrieved successfully",
+  "data": {
+    "total": 15,
+    "todo": 5,
+    "inProgress": 3,
+    "completed": 6,
+    "overdue": 1
+  }
+}
+```
+
+---
+
+### Task Sharing Endpoints (Protected)
+
+#### Share Task
+```http
+POST /api/tasks/:id/shares
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "sharedWith": "recipient-user-uuid",
+  "permission": "READ"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "message": "Task shared successfully",
+  "data": {
+    "id": "uuid",
+    "taskId": "task-uuid",
+    "sharedWith": "recipient-user-uuid",
+    "permission": "READ",
+    "createdAt": "2026-02-14T00:00:00.000Z"
+  }
+}
+```
+
+**Fields:**
+- `sharedWith` (required): UUID of the user to share with
+- `permission` (required): `READ` or `WRITE`
+
+---
+
+#### Get Shared Users
+```http
+GET /api/tasks/:id/shares
+Authorization: Bearer <token>
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Shared users retrieved successfully",
+  "data": [
+    {
+      "id": "uuid",
+      "taskId": "task-uuid",
+      "sharedWith": "user-uuid",
+      "permission": "READ",
+      "createdAt": "2026-02-14T00:00:00.000Z"
+    }
+  ]
+}
+```
+
+---
+
+#### Get Tasks Shared With Me
+```http
+GET /api/shared-tasks
+Authorization: Bearer <token>
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Shared tasks retrieved successfully",
+  "data": [
+    {
+      "id": "uuid",
+      "taskId": "task-uuid",
+      "sharedWith": "my-user-uuid",
+      "permission": "READ",
+      "createdAt": "2026-02-14T00:00:00.000Z"
+    }
+  ]
+}
+```
+
+---
+
+#### Update Share Permission
+```http
+PATCH /api/tasks/:id/shares/:sharedWith
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "permission": "WRITE"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Permission updated successfully",
+  "data": {
+    "id": "uuid",
+    "taskId": "task-uuid",
+    "sharedWith": "user-uuid",
+    "permission": "WRITE",
+    "createdAt": "2026-02-14T00:00:00.000Z"
+  }
+}
+```
+
+---
+
+#### Revoke Share
+```http
+DELETE /api/tasks/:id/shares/:sharedWith
+Authorization: Bearer <token>
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Share revoked successfully"
+}
+```
+
 ## 🚧 Project Status
 
-This project is currently in **Phase 2** of development:
+This project is currently in **Phase 3** of development:
 
 - [x] Phase 1: Foundation & TypeScript Setup
   - [x] TypeScript configuration
@@ -336,7 +634,12 @@ This project is currently in **Phase 2** of development:
   - [x] Protected routes
   - [x] Refresh token storage in database
 
-- [ ] Phase 3: Task Management & Authorization
+- [x] Phase 3: Task Management & Authorization
+  - [x] Task CRUD (create, read, update, delete)
+  - [x] Advanced querying, filtering & pagination
+  - [x] Authorization middleware & RBAC (USER/ADMIN roles)
+  - [x] Task sharing & collaboration (READ/WRITE permissions)
+
 - [ ] Phase 4: Advanced Features & Performance
 - [ ] Phase 5: Testing & Quality Assurance
 - [ ] Phase 6: Production Ready & Deployment
@@ -360,6 +663,9 @@ This project demonstrates understanding of:
 - ✅ Access and refresh token patterns
 - ✅ Token rotation for security
 - ✅ Protected route middleware
+- ✅ Role-based access control (RBAC)
+- ✅ Task sharing with permission levels
+- ✅ Advanced querying and filtering
 - ⏳ Testing strategies (TDD)
 - ⏳ Production deployment
 
