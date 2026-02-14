@@ -38,7 +38,7 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 - [X] Role-based access control
 - [x] Task sharing & collaboration
 - [ ] File attachments
-- [ ] Rate limiting
+- [X] Rate limiting
 - [ ] Redis caching
 - [ ] Comprehensive API documentation (Swagger)
 
@@ -54,6 +54,7 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 - Zod - Schema validation
 - Bcrypt - Password hashing
 - jsonwebtoken - JWT Authentication
+- express-rate-limit - API rate limiting
 
 **Database:**
 - PostgreSQL - Primary database
@@ -643,6 +644,11 @@ This project is currently in **Phase 3** of development:
   - [x] Task sharing & collaboration (READ/WRITE permissions)
 
 - [ ] Phase 4: Advanced Features & Performance
+  - [x] Rate limiting (global, auth, API tiers)
+  - [ ] Testing (Jest + Supertest)
+  - [ ] File attachments
+  - [ ] Redis caching
+
 - [ ] Phase 5: Testing & Quality Assurance
 - [ ] Phase 6: Production Ready & Deployment
 
@@ -668,6 +674,7 @@ This project demonstrates understanding of:
 - ✅ Role-based access control (RBAC)
 - ✅ Task sharing with permission levels
 - ✅ Advanced querying and filtering
+- ✅ Rate limiting and API abuse protection
 - ⏳ Testing strategies (TDD)
 - ⏳ Production deployment
 
