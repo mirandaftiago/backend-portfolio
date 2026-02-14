@@ -39,6 +39,7 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 - [x] Task sharing & collaboration
 - [ ] File attachments
 - [X] Rate limiting
+- [x] Unit & integration testing (Jest + Supertest)
 - [ ] Redis caching
 - [ ] Comprehensive API documentation (Swagger)
 
@@ -61,8 +62,8 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 - Redis - Caching layer (coming soon)
 
 **Testing:**
-- Jest - Testing framework (coming soon)
-- Supertest - API testing (coming soon)
+- Jest - Testing framework
+- Supertest - API testing
 
 **DevOps:**
 - pnpm - Package manager
@@ -645,7 +646,7 @@ This project is currently in **Phase 3** of development:
 
 - [ ] Phase 4: Advanced Features & Performance
   - [x] Rate limiting (global, auth, API tiers)
-  - [ ] Testing (Jest + Supertest)
+  - [x] Testing (Jest + Supertest)
   - [ ] File attachments
   - [ ] Redis caching
 
@@ -675,7 +676,7 @@ This project demonstrates understanding of:
 - ✅ Task sharing with permission levels
 - ✅ Advanced querying and filtering
 - ✅ Rate limiting and API abuse protection
-- ⏳ Testing strategies (TDD)
+- ✅ Testing strategies (unit & integration)
 - ⏳ Production deployment
 
 ## 🤝 Contributing
