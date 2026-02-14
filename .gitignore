@@ -6,6 +6,9 @@ dist/
 build/
 *.tsbuildinfo
 
+# File uploads
+uploads/
+
 # Logs
 logs/
 *.log

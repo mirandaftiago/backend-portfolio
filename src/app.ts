@@ -6,6 +6,7 @@ import healthRoutes from './routes/health.routes';
 import authRoutes from './routes/auth.routes';
 import taskRoutes from './routes/task.routes';
 import taskShareRoutes from './routes/task-share.routes';
+import attachmentRoutes from './routes/attachment.routes';
 import { errorHandler, notFoundHandler } from './middleware/error.middleware';
 import { globalLimiter, authLimiter, apiLimiter } from './middleware/rate-limit.middleware';
 
@@ -22,6 +23,7 @@ app.use(healthRoutes);
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/tasks', apiLimiter, taskRoutes);
 app.use('/api', apiLimiter, taskShareRoutes);
+app.use('/api', attachmentRoutes);
 
 // 404 handler
 app.use(notFoundHandler);

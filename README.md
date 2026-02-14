@@ -37,7 +37,7 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 - [X] Advanced filtering and pagination
 - [X] Role-based access control
 - [x] Task sharing & collaboration
-- [ ] File attachments
+- [x] File attachments
 - [X] Rate limiting
 - [x] Unit & integration testing (Jest + Supertest)
 - [ ] Redis caching
@@ -56,6 +56,7 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 - Bcrypt - Password hashing
 - jsonwebtoken - JWT Authentication
 - express-rate-limit - API rate limiting
+- Multer - File upload handling
 
 **Database:**
 - PostgreSQL - Primary database
@@ -647,7 +648,7 @@ This project is currently in **Phase 3** of development:
 - [ ] Phase 4: Advanced Features & Performance
   - [x] Rate limiting (global, auth, API tiers)
   - [x] Testing (Jest + Supertest)
-  - [ ] File attachments
+  - [x] File attachments (Multer + local storage)
   - [ ] Redis caching
 
 - [ ] Phase 5: Testing & Quality Assurance
@@ -677,6 +678,7 @@ This project demonstrates understanding of:
 - ✅ Advanced querying and filtering
 - ✅ Rate limiting and API abuse protection
 - ✅ Testing strategies (unit & integration)
+- ✅ File upload handling and storage
 - ⏳ Production deployment
 
 ## 🤝 Contributing
