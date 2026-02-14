@@ -70,6 +70,7 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 
 ## 📁 Project Structure
 
+```
 task-management-api/
 ├── src/
 │   ├── config/           # Configuration (database, etc.)
@@ -79,7 +80,7 @@ task-management-api/
 │   ├── dtos/             # Data Transfer Objects
 │   ├── schemas/          # Zod validation schemas
 │   ├── routes/           # API routes
-│   ├── middleware/       # Custom middleware
+│   ├── middleware/        # Custom middleware
 │   ├── errors/           # Custom error classes
 │   ├── types/            # TypeScript type definitions
 │   └── utils/            # Helper functions
@@ -90,6 +91,7 @@ task-management-api/
 │   ├── unit/             # Unit tests
 │   └── integration/      # Integration tests
 └── docs/                 # API documentation
+```
 
 ## 🏃 Getting Started
 
