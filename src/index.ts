@@ -5,6 +5,7 @@ import express, { Application } from 'express';
 import healthRoutes from './routes/health.routes';
 import authRoutes from './routes/auth.routes';
 import taskRoutes from './routes/task.routes';
+import taskShareRoutes from './routes/task-share.routes';
 import { errorHandler, notFoundHandler } from './middleware/error.middleware';
 
 // Initialize Express app
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api', taskShareRoutes);
 
 // 404 handler
 app.use(notFoundHandler);

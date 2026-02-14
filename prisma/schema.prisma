@@ -16,6 +16,7 @@ model User {
   password  String
   role      Role     @default(USER)
   tasks     Task[]
+  sharedTasks TaskShare[]
   refreshTokens RefreshToken[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -44,6 +45,7 @@ model Task {
   dueDate     DateTime?
   userId      String
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shares      TaskShare[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   completedAt DateTime?
@@ -52,6 +54,20 @@ model Task {
   @@index([userId])
   @@index([status])
   @@index([priority])
+}
+
+model TaskShare {
+  id          String     @id @default(uuid())
+  taskId      String
+  task        Task       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  sharedWith  String
+  user        User       @relation(fields: [sharedWith], references: [id], onDelete: Cascade)
+  permission  Permission @default(READ)
+  createdAt   DateTime   @default(now())
+
+  @@unique([taskId, sharedWith])
+  @@index([sharedWith])
+  @@map("task_shares")
 }
 
 enum Status {
@@ -70,4 +86,9 @@ enum Priority {
 enum Role {
   USER
   ADMIN
+}
+
+enum Permission {
+  READ
+  WRITE
 }
