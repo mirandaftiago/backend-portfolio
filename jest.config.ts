@@ -9,6 +9,9 @@ const config: Config = {
   setupFiles: ['<rootDir>/tests/setup.ts'],
   clearMocks: true,
   collectCoverageFrom: ['src/**/*.ts', '!src/index.ts'],
+  moduleNameMapper: {
+    '^(.*)/config/redis$': '<rootDir>/tests/mocks/redis.mock.ts',
+  },
 };
 
 export default config;

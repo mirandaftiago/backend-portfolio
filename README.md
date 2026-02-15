@@ -40,7 +40,7 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 - [x] File attachments
 - [X] Rate limiting
 - [x] Unit & integration testing (Jest + Supertest)
-- [ ] Redis caching
+- [x] Redis caching
 - [ ] Comprehensive API documentation (Swagger)
 
 ## 🛠️ Tech Stack
@@ -60,7 +60,7 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 
 **Database:**
 - PostgreSQL - Primary database
-- Redis - Caching layer (coming soon)
+- Redis - Caching layer (ioredis)
 
 **Testing:**
 - Jest - Testing framework
@@ -103,6 +103,7 @@ task-management-api/
 - Node.js v20 or higher
 - pnpm v8 or higher
 - PostgreSQL v14 or higher
+- Redis v7 or higher
 
 ### Installation
 
@@ -178,6 +179,9 @@ JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
 JWT_REFRESH_SECRET=your-super-secret-refresh-key-change-this-in-production
 JWT_EXPIRES_IN=15m
 JWT_REFRESH_EXPIRES_IN=7d
+
+# Redis
+REDIS_URL=redis://localhost:6379
 ```
 
 ## 📚 API Documentation
@@ -606,6 +610,21 @@ Authorization: Bearer <token>
 }
 ```
 
+## ⚡ Redis Caching
+
+The API uses Redis as a caching layer for task-related endpoints using a **cache-aside** pattern:
+
+- **Single task** (`GET /api/tasks/:id`) — cached for 10 minutes
+- **Task list** (`GET /api/tasks`) — cached for 5 minutes (cache key includes query parameters)
+- **Task stats** (`GET /api/tasks/stats`) — cached for 5 minutes
+
+**Cache invalidation** happens automatically on write operations:
+- `POST /api/tasks` — clears task list and stats caches for the user
+- `PATCH /api/tasks/:id` — clears the specific task cache + list/stats caches
+- `DELETE /api/tasks/:id` — clears the specific task cache + list/stats caches
+
+**Graceful degradation:** If Redis is unavailable, the API continues to work normally by querying the database directly. Cache errors are silently caught and never break the application.
+
 ## 🚧 Project Status
 
 This project is currently in **Phase 3** of development:
@@ -649,7 +668,7 @@ This project is currently in **Phase 3** of development:
   - [x] Rate limiting (global, auth, API tiers)
   - [x] Testing (Jest + Supertest)
   - [x] File attachments (Multer + local storage)
-  - [ ] Redis caching
+  - [x] Redis caching (cache-aside pattern with invalidation)
 
 - [ ] Phase 5: Testing & Quality Assurance
 - [ ] Phase 6: Production Ready & Deployment
@@ -679,6 +698,7 @@ This project demonstrates understanding of:
 - ✅ Rate limiting and API abuse protection
 - ✅ Testing strategies (unit & integration)
 - ✅ File upload handling and storage
+- ✅ Redis caching (cache-aside pattern, invalidation strategies)
 - ⏳ Production deployment
 
 ## 🤝 Contributing

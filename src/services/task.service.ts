@@ -3,13 +3,37 @@
 import { CreateTaskDTO, UpdateTaskDTO, QueryTasksDTO } from '../schemas/task.schema';
 import { TaskResponseDTO, PaginatedTasksDTO, UpdateTaskData, TaskStatsDTO } from '../dtos/task.dto';
 import { taskRepository } from '../repositories/task.repository';
+import { cacheService } from './cache.service';
 import { NotFoundError } from '../errors/app-errors';
 import { Role, Task } from '@prisma/client';
+import crypto from 'crypto';
+
+// Cache TTLs (in seconds)
+const TASK_TTL = 600; // 10 minutes
+const TASK_LIST_TTL = 300; // 5 minutes
+const STATS_TTL = 300; // 5 minutes
 
 /**
  * Task service - handles business logic
  */
 export class TaskService {
+  /**
+   * Generate a cache key for task list queries
+   * Hashes the query params so different filters get different cache entries
+   */
+  private getTaskListCacheKey(userId: string, query: QueryTasksDTO): string {
+    const hash = crypto.createHash('md5').update(JSON.stringify(query)).digest('hex');
+    return `tasks:${userId}:${hash}`;
+  }
+
+  /**
+   * Invalidate all task-related caches for a user
+   */
+  private async invalidateUserTaskCache(userId: string): Promise<void> {
+    await cacheService.delByPattern(`tasks:${userId}:*`);
+    await cacheService.del(`taskStats:${userId}`);
+  }
+
   /**
    * Create new task
    */
@@ -19,6 +43,9 @@ export class TaskService {
       userId,
     });
 
+    // Invalidate list and stats caches
+    await this.invalidateUserTaskCache(userId);
+
     return this.toTaskResponseDTO(task);
   }
 
@@ -26,6 +53,13 @@ export class TaskService {
    * Get all tasks for user with filters and pagination
    */
   async getTasks(userId: string, role: Role, query: QueryTasksDTO): Promise<PaginatedTasksDTO> {
+    const effectiveUserId = role === 'ADMIN' ? undefined : userId;
+    const cacheKey = this.getTaskListCacheKey(effectiveUserId || 'admin', query);
+
+    // Check cache
+    const cached = await cacheService.get<PaginatedTasksDTO>(cacheKey);
+    if (cached) return cached;
+
     const {
       page = 1,
       pageSize = 10,
@@ -55,8 +89,6 @@ export class TaskService {
       sortOrder,
     };
 
-    const effectiveUserId = role === 'ADMIN' ? undefined : userId;
-
     const { tasks, total } = await taskRepository.findAllByUser(
       effectiveUserId,
       filters,
@@ -65,7 +97,7 @@ export class TaskService {
 
     const totalPages = Math.ceil(total / pageSize);
 
-    return {
+    const result: PaginatedTasksDTO = {
       data: tasks.map(this.toTaskResponseDTO),
       pagination: {
         page,
@@ -74,19 +106,35 @@ export class TaskService {
         totalPages,
       },
     };
+
+    // Store in cache
+    await cacheService.set(cacheKey, result, TASK_LIST_TTL);
+
+    return result;
   }
 
   /**
    * Get task by ID
    */
   async getTaskById(userId: string, taskId: string): Promise<TaskResponseDTO> {
+    const cacheKey = `task:${taskId}`;
+
+    // Check cache
+    const cached = await cacheService.get<TaskResponseDTO>(cacheKey);
+    if (cached) return cached;
+
     const task = await taskRepository.findById(taskId, userId);
 
     if (!task) {
       throw new NotFoundError('Task not found');
     }
 
-    return this.toTaskResponseDTO(task);
+    const result = this.toTaskResponseDTO(task);
+
+    // Store in cache
+    await cacheService.set(cacheKey, result, TASK_TTL);
+
+    return result;
   }
 
   /**
@@ -116,6 +164,10 @@ export class TaskService {
 
     const updatedTask = await taskRepository.update(taskId, userId, updateData);
 
+    // Invalidate caches
+    await cacheService.del(`task:${taskId}`);
+    await this.invalidateUserTaskCache(userId);
+
     return this.toTaskResponseDTO(updatedTask);
   }
 
@@ -130,25 +182,40 @@ export class TaskService {
     }
 
     await taskRepository.delete(taskId, userId);
+
+    // Invalidate caches
+    await cacheService.del(`task:${taskId}`);
+    await this.invalidateUserTaskCache(userId);
   }
 
   /**
    * Get task statistics for user
    */
   async getTaskStats(userId: string): Promise<TaskStatsDTO> {
+    const cacheKey = `taskStats:${userId}`;
+
+    // Check cache
+    const cached = await cacheService.get<TaskStatsDTO>(cacheKey);
+    if (cached) return cached;
+
     const total = await taskRepository.countByUser(userId);
     const todo = await taskRepository.countByUserAndStatus(userId, 'TODO');
     const inProgress = await taskRepository.countByUserAndStatus(userId, 'IN_PROGRESS');
     const completed = await taskRepository.countByUserAndStatus(userId, 'COMPLETED');
     const overdue = await taskRepository.countOverdueByUser(userId);
 
-    return {
+    const result: TaskStatsDTO = {
       total,
       todo,
       inProgress,
       completed,
       overdue,
     };
+
+    // Store in cache
+    await cacheService.set(cacheKey, result, STATS_TTL);
+
+    return result;
   }
 
   /**

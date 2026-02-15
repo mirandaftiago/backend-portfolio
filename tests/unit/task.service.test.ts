@@ -7,6 +7,7 @@ import { Task } from '@prisma/client';
 
 // Mock the repository module — all methods become jest.fn()
 jest.mock('../../src/repositories/task.repository');
+jest.mock('../../src/services/cache.service');
 
 describe('TaskService', () => {
   let service: TaskService;
