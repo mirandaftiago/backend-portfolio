@@ -1,5 +1,7 @@
 // src/app.ts
 
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './config/swagger';
 import { env } from './config/env';
 import helmet from 'helmet';
 import cors from 'cors';
@@ -35,6 +37,9 @@ const isTest = env.NODE_ENV === 'test';
 if (!isTest) {
   app.use(globalLimiter);
 }
+
+// API Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routes
 app.use(healthRoutes);

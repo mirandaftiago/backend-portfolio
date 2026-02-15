@@ -41,7 +41,7 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 - [X] Rate limiting
 - [x] Unit & integration testing (Jest + Supertest)
 - [x] Redis caching
-- [ ] Comprehensive API documentation (Swagger)
+- [x] Comprehensive API documentation (Swagger)
 
 ## 🛠️ Tech Stack
 
@@ -61,6 +61,8 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 - Helmet - HTTP security headers
 - CORS - Cross-origin resource sharing
 - express-xss-sanitizer - XSS input sanitization
+- swagger-jsdoc - OpenAPI spec generation
+- swagger-ui-express - Interactive API documentation
 
 **Database:**
 - PostgreSQL - Primary database
@@ -211,507 +213,14 @@ JWT_REFRESH_EXPIRES_IN=7d
 # Redis
 REDIS_URL=redis://localhost:6379
 ```
-
 ## 📚 API Documentation
 
-> All protected endpoints require the `Authorization: Bearer <token>` header.
+Interactive API documentation is available via Swagger UI:
 
-### Authentication Endpoints
+http://localhost:3000/api-docs
 
-#### Register User
-```http
-POST /api/auth/register
-Content-Type: application/json
 
-{
-  "username": "johndoe",
-  "email": "john@example.com",
-  "password": "SecurePass123"
-}
-```
-
-**Response (201 Created):**
-```json
-{
-  "message": "User registered successfully",
-  "data": {
-    "id": "uuid",
-    "username": "johndoe",
-    "email": "john@example.com",
-    "createdAt": "2026-02-09T00:00:00.000Z",
-    "updatedAt": "2026-02-09T00:00:00.000Z"
-  }
-}
-```
-
-**Validation Rules:**
-- Username: 3-20 characters, alphanumeric + underscore only
-- Email: Valid email format
-- Password: Min 8 characters, must contain uppercase, lowercase, and number
-
----
-
-#### Login User
-```http
-POST /api/auth/login
-Content-Type: application/json
-
-{
-  "email": "john@example.com",
-  "password": "SecurePass123"
-}
-```
-
-**Response (200 OK):**
-```json
-{
-  "message": "Login successful",
-  "data": {
-    "user": {
-      "id": "uuid",
-      "username": "johndoe",
-      "email": "john@example.com",
-      "createdAt": "2026-02-09T00:00:00.000Z",
-      "updatedAt": "2026-02-09T00:00:00.000Z"
-    },
-    "accessToken": "eyJhbGciOiJIUzI1NiIs...",
-    "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
-  }
-}
-```
-
----
-
-#### Refresh Token
-```http
-POST /api/auth/refresh
-Content-Type: application/json
-
-{
-  "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
-}
-```
-
-**Response (200 OK):**
-```json
-{
-  "message": "Token refreshed successfully",
-  "data": {
-    "accessToken": "eyJhbGciOiJIUzI1NiIs...",
-    "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
-  }
-}
-```
-
----
-
-#### Logout
-```http
-POST /api/auth/logout
-Content-Type: application/json
-
-{
-  "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
-}
-```
-
-**Response (200 OK):**
-```json
-{
-  "message": "Logout successful"
-}
-```
-
----
-
-#### Get Current User (Protected)
-```http
-GET /api/auth/me
-Authorization: Bearer <token>
-```
-
-**Response (200 OK):**
-```json
-{
-  "message": "Profile retrieved successfully",
-  "data": {
-    "userId": "uuid",
-    "email": "john@example.com",
-    "iat": 1234567890,
-    "exp": 1234568790
-  }
-}
-```
-
----
-
-### Task Endpoints (Protected)
-
-#### Create Task
-```http
-POST /api/tasks
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "title": "My new task",
-  "description": "Optional description",
-  "priority": "HIGH",
-  "status": "TODO",
-  "dueDate": "2026-03-01T00:00:00.000Z"
-}
-```
-
-**Response (201 Created):**
-```json
-{
-  "message": "Task created successfully",
-  "data": {
-    "id": "uuid",
-    "title": "My new task",
-    "description": "Optional description",
-    "status": "TODO",
-    "priority": "HIGH",
-    "dueDate": "2026-03-01T00:00:00.000Z",
-    "userId": "uuid",
-    "createdAt": "2026-02-14T00:00:00.000Z",
-    "updatedAt": "2026-02-14T00:00:00.000Z",
-    "completedAt": null
-  }
-}
-```
-
-**Fields:**
-- `title` (required): Task title
-- `description` (optional): Task description
-- `priority` (optional): `LOW`, `MEDIUM`, `HIGH`, `URGENT` (default: `MEDIUM`)
-- `status` (optional): `TODO`, `IN_PROGRESS`, `COMPLETED` (default: `TODO`)
-- `dueDate` (optional): ISO 8601 date string
-
----
-
-#### List Tasks
-```http
-GET /api/tasks?status=TODO&priority=HIGH&search=meeting&page=1&pageSize=10&sortBy=createdAt&sortOrder=desc
-Authorization: Bearer <token>
-```
-
-**Query Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `status` | string | Filter by status: `TODO`, `IN_PROGRESS`, `COMPLETED` |
-| `priority` | string | Filter by priority: `LOW`, `MEDIUM`, `HIGH`, `URGENT` |
-| `search` | string | Search in title and description |
-| `dueDateFrom` | ISO date | Tasks due after this date |
-| `dueDateTo` | ISO date | Tasks due before this date |
-| `overdue` | boolean | Only overdue tasks |
-| `page` | number | Page number (default: 1) |
-| `pageSize` | number | Items per page (default: 10) |
-| `sortBy` | string | Sort field: `createdAt`, `dueDate`, `priority`, `title` |
-| `sortOrder` | string | `asc` or `desc` (default: `desc`) |
-
-**Response (200 OK):**
-```json
-{
-  "message": "Tasks retrieved successfully",
-  "data": [ ... ],
-  "pagination": {
-    "page": 1,
-    "pageSize": 10,
-    "total": 25,
-    "totalPages": 3
-  }
-}
-```
-
-> ADMIN users can see all tasks. Regular users only see their own.
-
----
-
-#### Get Task by ID
-```http
-GET /api/tasks/:id
-Authorization: Bearer <token>
-```
-
-**Response (200 OK):**
-```json
-{
-  "message": "Task retrieved successfully",
-  "data": {
-    "id": "uuid",
-    "title": "My task",
-    "description": null,
-    "status": "TODO",
-    "priority": "MEDIUM",
-    "dueDate": null,
-    "userId": "uuid",
-    "createdAt": "2026-02-14T00:00:00.000Z",
-    "updatedAt": "2026-02-14T00:00:00.000Z",
-    "completedAt": null
-  }
-}
-```
-
----
-
-#### Update Task
-```http
-PATCH /api/tasks/:id
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "title": "Updated title",
-  "status": "IN_PROGRESS",
-  "priority": "URGENT"
-}
-```
-
-**Response (200 OK):**
-```json
-{
-  "message": "Task updated successfully",
-  "data": { ... }
-}
-```
-
----
-
-#### Delete Task
-```http
-DELETE /api/tasks/:id
-Authorization: Bearer <token>
-```
-
-**Response (200 OK):**
-```json
-{
-  "message": "Task deleted successfully"
-}
-```
-
----
-
-#### Get Task Statistics
-```http
-GET /api/tasks/stats
-Authorization: Bearer <token>
-```
-
-**Response (200 OK):**
-```json
-{
-  "message": "Task statistics retrieved successfully",
-  "data": {
-    "total": 15,
-    "todo": 5,
-    "inProgress": 3,
-    "completed": 6,
-    "overdue": 1
-  }
-}
-```
-
----
-
-### Task Sharing Endpoints (Protected)
-
-#### Share Task
-```http
-POST /api/tasks/:id/shares
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "sharedWith": "recipient-user-uuid",
-  "permission": "READ"
-}
-```
-
-**Response (201 Created):**
-```json
-{
-  "message": "Task shared successfully",
-  "data": {
-    "id": "uuid",
-    "taskId": "task-uuid",
-    "sharedWith": "recipient-user-uuid",
-    "permission": "READ",
-    "createdAt": "2026-02-14T00:00:00.000Z"
-  }
-}
-```
-
-**Fields:**
-- `sharedWith` (required): UUID of the user to share with
-- `permission` (required): `READ` or `WRITE`
-
----
-
-#### Get Shared Users
-```http
-GET /api/tasks/:id/shares
-Authorization: Bearer <token>
-```
-
-**Response (200 OK):**
-```json
-{
-  "message": "Shared users retrieved successfully",
-  "data": [
-    {
-      "id": "uuid",
-      "taskId": "task-uuid",
-      "sharedWith": "user-uuid",
-      "permission": "READ",
-      "createdAt": "2026-02-14T00:00:00.000Z"
-    }
-  ]
-}
-```
-
----
-
-#### Get Tasks Shared With Me
-```http
-GET /api/shared-tasks
-Authorization: Bearer <token>
-```
-
-**Response (200 OK):**
-```json
-{
-  "message": "Shared tasks retrieved successfully",
-  "data": [
-    {
-      "id": "uuid",
-      "taskId": "task-uuid",
-      "sharedWith": "my-user-uuid",
-      "permission": "READ",
-      "createdAt": "2026-02-14T00:00:00.000Z"
-    }
-  ]
-}
-```
-
----
-
-#### Update Share Permission
-```http
-PATCH /api/tasks/:id/shares/:sharedWith
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "permission": "WRITE"
-}
-```
-
-**Response (200 OK):**
-```json
-{
-  "message": "Permission updated successfully",
-  "data": {
-    "id": "uuid",
-    "taskId": "task-uuid",
-    "sharedWith": "user-uuid",
-    "permission": "WRITE",
-    "createdAt": "2026-02-14T00:00:00.000Z"
-  }
-}
-```
-
----
-
-#### Revoke Share
-```http
-DELETE /api/tasks/:id/shares/:sharedWith
-Authorization: Bearer <token>
-```
-
-**Response (200 OK):**
-```json
-{
-  "message": "Share revoked successfully"
-}
-```
-
-### File Attachment Endpoints (Protected)
-
-#### Upload Attachment
-```http
-POST /api/tasks/:id/attachments
-Authorization: Bearer <token>
-Content-Type: multipart/form-data
-
-file: <binary>
-```
-
-**Response (201 Created):**
-```json
-{
-  "message": "File uploaded successfully",
-  "data": {
-    "id": "uuid",
-    "taskId": "task-uuid",
-    "filename": "1707900000000-abc123.png",
-    "originalName": "screenshot.png",
-    "mimeType": "image/png",
-    "size": 204800,
-    "uploadedBy": "user-uuid",
-    "createdAt": "2026-02-14T00:00:00.000Z"
-  }
-}
-```
-
-**Constraints:**
-- Max file size: 5MB
-- Allowed types: Images (JPEG, PNG, GIF, WebP), PDF, plain text, Word documents (.doc, .docx)
-
----
-
-#### List Attachments
-```http
-GET /api/tasks/:id/attachments
-Authorization: Bearer <token>
-```
-
-**Response (200 OK):**
-```json
-{
-  "message": "Attachments retrieved successfully",
-  "data": [ ... ]
-}
-```
-
----
-
-#### Download Attachment
-```http
-GET /api/attachments/:attachmentId/download
-Authorization: Bearer <token>
-```
-
-Returns the file as a binary download with the original filename.
-
----
-
-#### Delete Attachment
-```http
-DELETE /api/attachments/:attachmentId
-Authorization: Bearer <token>
-```
-
-**Response (200 OK):**
-```json
-{
-  "message": "Attachment deleted successfully"
-}
-```
-
----
+All protected endpoints require the `Authorization: Bearer <token>` header. Use the "Authorize" button in Swagger UI to set your JWT token.
 
 ## 🛡️ Rate Limiting
 
@@ -772,6 +281,8 @@ curl http://localhost:3000/health
 
 # Stop all services
 docker compose down
+```
+
 The Dockerfile uses a multi-stage build:
 
 Builder stage — installs all deps, generates Prisma client, compiles TypeScript
@@ -829,8 +340,24 @@ This project is currently in **Phase 6** of development:
   - [x] Security hardening (Helmet, CORS, input sanitization)
   - [x] CI pipeline (GitHub Actions)
 
-- [ ] Phase 6: Production Ready & Deployment
+- [x] Phase 6: Production Ready & Deployment
+    - [x] Docker containerization
     - [x] Environment validation & graceful shutdown
+    - [x] API documentation (Swagger/OpenAPI)
+
+- [ ] Phase 7: Cloud Deployment
+    - [ ] Deploy to cloud platform (Railway / Fly.io)
+    - [ ] Production database setup
+    - [ ] CI/CD pipeline for deployment
+
+- [ ] Phase 8: Real-Time Features
+    - [ ] WebSockets for real-time task updates
+
+- [ ] Phase 9: Notifications
+    - [ ] Email notifications (task due date reminders)
+
+- [ ] Phase 10: Admin Dashboard
+    - [ ] Admin dashboard endpoints
 
 ## 🎯 Learning Goals
 
@@ -863,6 +390,7 @@ This project demonstrates understanding of:
 - ✅ CI/CD pipeline with GitHub Actions
 - ✅ Docker containerization with multi-stage builds
 - ✅ Environment validation with Zod and graceful shutdown
+- ✅ API documentation with Swagger/OpenAPI
 
 ## 🤝 Contributing
 
