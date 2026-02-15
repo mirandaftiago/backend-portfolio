@@ -75,6 +75,7 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 - ESLint & Prettier - Code quality
 - ts-node-dev - Development server
 - pino-pretty - Dev log formatting
+- GitHub Actions - CI pipeline
 
 ## 📁 Project Structure
 
@@ -799,11 +800,11 @@ This project is currently in **Phase 5** of development:
   - [x] File attachments (Multer + local storage)
   - [x] Redis caching (cache-aside pattern with invalidation)
 
-- [ ] Phase 5: Testing & Quality Assurance
+- [x] Phase 5: Testing & Quality Assurance
   - [x] Expanded test coverage (auth, task sharing, unit + integration)
   - [x] Structured logging (Winston/Pino)
   - [x] Security hardening (Helmet, CORS, input sanitization)
-  - [ ] CI pipeline (GitHub Actions)
+  - [x] CI pipeline (GitHub Actions)
 
 - [ ] Phase 6: Production Ready & Deployment
 
@@ -835,6 +836,7 @@ This project demonstrates understanding of:
 - ✅ Redis caching (cache-aside pattern, invalidation strategies)
 - ✅ Structured logging with Pino (JSON in production, pretty in dev)
 - ✅ Security hardening (Helmet, CORS, XSS sanitization)
+- ✅ CI/CD pipeline with GitHub Actions
 - ⏳ Production deployment
 
 ## 🤝 Contributing
