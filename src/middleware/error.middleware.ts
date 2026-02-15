@@ -3,6 +3,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError, ValidationError } from '../errors/app-errors';
 import { ZodIssue } from 'zod';
+import logger from '../config/logger';
 
 interface ErrorResponse {
   error: {
@@ -23,10 +24,7 @@ export const errorHandler = (
   _next: NextFunction,
 ): void => {
   // Log error
-  console.error('Error:', err.message);
-  if (!(err instanceof AppError)) {
-    console.error('Stack:', err.stack);
-  }
+  logger.error({ err, path: _req.path, method: _req.method }, err.message);
 
   // Handle AppError (known errors)
   if (err instanceof AppError) {

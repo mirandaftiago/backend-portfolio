@@ -9,6 +9,7 @@ import taskShareRoutes from './routes/task-share.routes';
 import attachmentRoutes from './routes/attachment.routes';
 import { errorHandler, notFoundHandler } from './middleware/error.middleware';
 import { globalLimiter, authLimiter, apiLimiter } from './middleware/rate-limit.middleware';
+import { requestLogger } from './middleware/request-logger.middleware';
 
 // Initialize Express app
 const app: Application = express();
@@ -16,6 +17,7 @@ const app: Application = express();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(requestLogger);
 
 // Apply rate limiters (skip in test environment)
 const isTest = process.env.NODE_ENV === 'test';

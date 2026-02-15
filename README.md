@@ -57,6 +57,7 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 - jsonwebtoken - JWT Authentication
 - express-rate-limit - API rate limiting
 - Multer - File upload handling
+- Pino - Structured logging
 
 **Database:**
 - PostgreSQL - Primary database
@@ -70,6 +71,7 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 - pnpm - Package manager
 - ESLint & Prettier - Code quality
 - ts-node-dev - Development server
+- pino-pretty - Dev log formatting
 
 ## 📁 Project Structure
 
@@ -779,7 +781,7 @@ This project is currently in **Phase 5** of development:
 
 - [ ] Phase 5: Testing & Quality Assurance
   - [x] Expanded test coverage (auth, task sharing, unit + integration)
-  - [ ] Structured logging (Winston/Pino)
+  - [x] Structured logging (Winston/Pino)
   - [ ] Security hardening (Helmet, CORS, input sanitization)
   - [ ] CI pipeline (GitHub Actions)
 
@@ -811,6 +813,7 @@ This project demonstrates understanding of:
 - ✅ Testing strategies (unit & integration)
 - ✅ File upload handling and storage
 - ✅ Redis caching (cache-aside pattern, invalidation strategies)
+- ✅ Structured logging with Pino (JSON in production, pretty in dev)
 - ⏳ Production deployment
 
 ## 🤝 Contributing
