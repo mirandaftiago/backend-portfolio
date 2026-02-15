@@ -1,6 +1,10 @@
 // src/app.ts
 
 import 'dotenv/config';
+import helmet from 'helmet';
+import cors from 'cors';
+import { xss } from 'express-xss-sanitizer';
+import { corsOptions } from './config/security';
 import express, { Application } from 'express';
 import healthRoutes from './routes/health.routes';
 import authRoutes from './routes/auth.routes';
@@ -17,6 +21,13 @@ const app: Application = express();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Security middleware
+app.use(helmet());
+app.use(cors(corsOptions));
+app.use(xss());
+
+// Request logging
 app.use(requestLogger);
 
 // Apply rate limiters (skip in test environment)

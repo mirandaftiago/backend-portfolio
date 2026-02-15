@@ -58,6 +58,9 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 - express-rate-limit - API rate limiting
 - Multer - File upload handling
 - Pino - Structured logging
+- Helmet - HTTP security headers
+- CORS - Cross-origin resource sharing
+- express-xss-sanitizer - XSS input sanitization
 
 **Database:**
 - PostgreSQL - Primary database
@@ -734,6 +737,23 @@ The API uses Redis as a caching layer for task-related endpoints using a **cache
 
 **Graceful degradation:** If Redis is unavailable, the API continues to work normally by querying the database directly. Cache errors are silently caught and never break the application.
 
+## 🔒 Security
+
+The API includes multiple layers of security:
+
+| Layer | Tool | Purpose |
+|-------|------|---------|
+| HTTP Headers | Helmet | Sets security headers (X-Content-Type-Options, X-Frame-Options, HSTS, etc.) |
+| CORS | cors | Restricts cross-origin requests to allowed domains |
+| XSS Protection | express-xss-sanitizer | Strips malicious HTML/script tags from request input |
+| Rate Limiting | express-rate-limit | Prevents brute force and API abuse |
+| Authentication | JWT | Bearer token authentication with refresh rotation |
+| Password Security | bcrypt | Salted password hashing |
+| Input Validation | Zod | Schema-based request validation |
+
+CORS origins are configurable via the `CORS_ORIGIN` environment variable (comma-separated).
+
+
 ## 🚧 Project Status
 
 This project is currently in **Phase 5** of development:
@@ -782,7 +802,7 @@ This project is currently in **Phase 5** of development:
 - [ ] Phase 5: Testing & Quality Assurance
   - [x] Expanded test coverage (auth, task sharing, unit + integration)
   - [x] Structured logging (Winston/Pino)
-  - [ ] Security hardening (Helmet, CORS, input sanitization)
+  - [x] Security hardening (Helmet, CORS, input sanitization)
   - [ ] CI pipeline (GitHub Actions)
 
 - [ ] Phase 6: Production Ready & Deployment
@@ -814,6 +834,7 @@ This project demonstrates understanding of:
 - ✅ File upload handling and storage
 - ✅ Redis caching (cache-aside pattern, invalidation strategies)
 - ✅ Structured logging with Pino (JSON in production, pretty in dev)
+- ✅ Security hardening (Helmet, CORS, XSS sanitization)
 - ⏳ Production deployment
 
 ## 🤝 Contributing
