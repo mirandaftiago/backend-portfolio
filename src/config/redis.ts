@@ -1,9 +1,9 @@
 // src/config/redis.ts
-
+import { env } from './env';
 import Redis from 'ioredis';
 import logger from './logger';
 
-const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
+const REDIS_URL = env.REDIS_URL || 'redis://localhost:6379';
 
 const redis = new Redis(REDIS_URL, {
   maxRetriesPerRequest: 3,

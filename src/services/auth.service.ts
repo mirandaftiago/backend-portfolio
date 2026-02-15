@@ -14,9 +14,10 @@ import {
   getTokenExpirationDate,
 } from '../utils/jwt.utils';
 import { User } from '@prisma/client';
+import { env } from '../config/env';
 
 const SALT_ROUNDS = 10;
-const REFRESH_TOKEN_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
+const REFRESH_TOKEN_EXPIRES_IN = env.JWT_REFRESH_EXPIRES_IN || '7d';
 
 /**
  * Authentication service - handles business logic

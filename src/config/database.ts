@@ -1,5 +1,6 @@
 // src/config/database.ts
 
+import { env } from './env';
 import { PrismaClient } from '@prisma/client';
 
 /**
@@ -7,7 +8,7 @@ import { PrismaClient } from '@prisma/client';
  * Singleton pattern to avoid multiple instances
  */
 const prisma = new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  log: env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
 });
 
 /**

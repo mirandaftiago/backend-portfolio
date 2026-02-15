@@ -1,9 +1,10 @@
 // src/config/logger.ts
 
+import { env } from './env';
 import pino from 'pino';
 
-const isProduction = process.env.NODE_ENV === 'production';
-const isTest = process.env.NODE_ENV === 'test';
+const isProduction = env.NODE_ENV === 'production';
+const isTest = env.NODE_ENV === 'test';
 
 const logger = pino({
   level: isTest ? 'silent' : isProduction ? 'info' : 'debug',

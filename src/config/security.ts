@@ -1,8 +1,8 @@
 // src/config/security.ts
-
+import { env } from './env';
 import { CorsOptions } from 'cors';
 
-const allowedOrigins = process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'];
+const allowedOrigins = env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'];
 
 export const corsOptions: CorsOptions = {
   origin: allowedOrigins,

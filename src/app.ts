@@ -1,6 +1,6 @@
 // src/app.ts
 
-import 'dotenv/config';
+import { env } from './config/env';
 import helmet from 'helmet';
 import cors from 'cors';
 import { xss } from 'express-xss-sanitizer';
@@ -31,7 +31,7 @@ app.use(xss());
 app.use(requestLogger);
 
 // Apply rate limiters (skip in test environment)
-const isTest = process.env.NODE_ENV === 'test';
+const isTest = env.NODE_ENV === 'test';
 if (!isTest) {
   app.use(globalLimiter);
 }
