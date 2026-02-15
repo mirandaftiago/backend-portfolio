@@ -162,6 +162,9 @@ pnpm run format       # Format code with Prettier
 pnpm run type-check   # Type check without emitting files
 pnpm db:migrate       # Run database migrations
 pnpm db:studio        # Open Prisma Studio (database GUI)
+pnpm test             # Run all tests
+pnpm test:watch       # Run tests in watch mode
+pnpm test:coverage    # Run tests with coverage report
 ```
 
 ## 🔐 Environment Variables
@@ -610,6 +613,93 @@ Authorization: Bearer <token>
 }
 ```
 
+### File Attachment Endpoints (Protected)
+
+#### Upload Attachment
+```http
+POST /api/tasks/:id/attachments
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+
+file: <binary>
+```
+
+**Response (201 Created):**
+```json
+{
+  "message": "File uploaded successfully",
+  "data": {
+    "id": "uuid",
+    "taskId": "task-uuid",
+    "filename": "1707900000000-abc123.png",
+    "originalName": "screenshot.png",
+    "mimeType": "image/png",
+    "size": 204800,
+    "uploadedBy": "user-uuid",
+    "createdAt": "2026-02-14T00:00:00.000Z"
+  }
+}
+```
+
+**Constraints:**
+- Max file size: 5MB
+- Allowed types: Images (JPEG, PNG, GIF, WebP), PDF, plain text, Word documents (.doc, .docx)
+
+---
+
+#### List Attachments
+```http
+GET /api/tasks/:id/attachments
+Authorization: Bearer <token>
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Attachments retrieved successfully",
+  "data": [ ... ]
+}
+```
+
+---
+
+#### Download Attachment
+```http
+GET /api/attachments/:attachmentId/download
+Authorization: Bearer <token>
+```
+
+Returns the file as a binary download with the original filename.
+
+---
+
+#### Delete Attachment
+```http
+DELETE /api/attachments/:attachmentId
+Authorization: Bearer <token>
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Attachment deleted successfully"
+}
+```
+
+---
+
+## 🛡️ Rate Limiting
+
+The API uses tiered rate limiting to prevent abuse:
+
+| Tier | Scope | Limit | Description |
+|------|-------|-------|-------------|
+| Global | All routes | 100 requests / 15 min | Applies to every request |
+| Auth | `/api/auth/*` | 10 requests / 15 min | Protects login/register from brute force |
+| API | `/api/*` | 50 requests / 15 min | Protects authenticated endpoints |
+
+Exceeding any limit returns `429 Too Many Requests`.
+
 ## ⚡ Redis Caching
 
 The API uses Redis as a caching layer for task-related endpoints using a **cache-aside** pattern:
@@ -627,7 +717,7 @@ The API uses Redis as a caching layer for task-related endpoints using a **cache
 
 ## 🚧 Project Status
 
-This project is currently in **Phase 3** of development:
+This project is currently in **Phase 4** of development:
 
 - [x] Phase 1: Foundation & TypeScript Setup
   - [x] TypeScript configuration
