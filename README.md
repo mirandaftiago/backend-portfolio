@@ -137,6 +137,23 @@ task-management-api/
 The API will be available at `http://localhost:3000`
 
 ## 🧪 Testing
+
+The project uses **Jest** and **Supertest** for unit and integration testing. Rate limiters are automatically disabled in the test environment.
+
+```bash
+pnpm test             # Run all tests (62 tests across 5 suites)
+pnpm test:watch       # Run in watch mode
+pnpm test:coverage    # Run with coverage report
+```
+
+**Test suites:**
+- Unit: AuthService (12 tests) — register, login, refresh, logout
+- Unit: TaskService (13 tests) — CRUD, stats, pagination
+- Integration: Auth endpoints (17 tests) — register, login, refresh, logout, profile
+- Integration: Task endpoints (8 tests) — CRUD with validation
+- Integration: Task Share endpoints (12 tests) — share, permissions, revoke
+
+### Quick Start (curl)
 ```bash
 # Health check
 curl http://localhost:3000/health
@@ -717,7 +734,7 @@ The API uses Redis as a caching layer for task-related endpoints using a **cache
 
 ## 🚧 Project Status
 
-This project is currently in **Phase 4** of development:
+This project is currently in **Phase 5** of development:
 
 - [x] Phase 1: Foundation & TypeScript Setup
   - [x] TypeScript configuration
@@ -761,6 +778,11 @@ This project is currently in **Phase 4** of development:
   - [x] Redis caching (cache-aside pattern with invalidation)
 
 - [ ] Phase 5: Testing & Quality Assurance
+  - [x] Expanded test coverage (auth, task sharing, unit + integration)
+  - [ ] Structured logging (Winston/Pino)
+  - [ ] Security hardening (Helmet, CORS, input sanitization)
+  - [ ] CI pipeline (GitHub Actions)
+
 - [ ] Phase 6: Production Ready & Deployment
 
 ## 🎯 Learning Goals
