@@ -1,5 +1,8 @@
 // tests/setup.ts
 
+// Set test environment before loading dotenv (so .env doesn't override it)
+process.env.NODE_ENV = 'test';
+
 // Load environment variables for tests
 import 'dotenv/config';
 

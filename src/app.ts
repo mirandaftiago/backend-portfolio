@@ -16,13 +16,18 @@ const app: Application = express();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(globalLimiter); // Apply global rate limiter to all routes
+
+// Apply rate limiters (skip in test environment)
+const isTest = process.env.NODE_ENV === 'test';
+if (!isTest) {
+  app.use(globalLimiter);
+}
 
 // Routes
 app.use(healthRoutes);
-app.use('/api/auth', authLimiter, authRoutes);
-app.use('/api/tasks', apiLimiter, taskRoutes);
-app.use('/api', apiLimiter, taskShareRoutes);
+app.use('/api/auth', ...(isTest ? [] : [authLimiter]), authRoutes);
+app.use('/api/tasks', ...(isTest ? [] : [apiLimiter]), taskRoutes);
+app.use('/api', ...(isTest ? [] : [apiLimiter]), taskShareRoutes);
 app.use('/api', attachmentRoutes);
 
 // 404 handler
