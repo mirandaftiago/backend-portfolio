@@ -76,6 +76,8 @@ This project is a comprehensive **Task Management API** developed as part of a 1
 - ts-node-dev - Development server
 - pino-pretty - Dev log formatting
 - GitHub Actions - CI pipeline
+- Docker - Containerization
+- Docker Compose - Multi-container orchestration
 
 ## 📁 Project Structure
 
@@ -754,10 +756,31 @@ The API includes multiple layers of security:
 
 CORS origins are configurable via the `CORS_ORIGIN` environment variable (comma-separated).
 
+## 🐳 Docker
+
+Run the full stack (API + PostgreSQL + Redis) with Docker Compose:
+
+```bash
+# Start all services
+docker compose up --build
+
+# Run database migrations (in a new terminal)
+docker compose exec api npx prisma migrate deploy
+
+# Test the API
+curl http://localhost:3000/health
+
+# Stop all services
+docker compose down
+The Dockerfile uses a multi-stage build:
+
+Builder stage — installs all deps, generates Prisma client, compiles TypeScript
+Production stage — installs only production deps, copies compiled JS, runs as non-root node user
+
 
 ## 🚧 Project Status
 
-This project is currently in **Phase 5** of development:
+This project is currently in **Phase 6** of development:
 
 - [x] Phase 1: Foundation & TypeScript Setup
   - [x] TypeScript configuration
@@ -806,7 +829,7 @@ This project is currently in **Phase 5** of development:
   - [x] Security hardening (Helmet, CORS, input sanitization)
   - [x] CI pipeline (GitHub Actions)
 
-- [ ] Phase 6: Production Ready & Deployment
+- [z] Phase 6: Production Ready & Deployment
 
 ## 🎯 Learning Goals
 
@@ -837,7 +860,7 @@ This project demonstrates understanding of:
 - ✅ Structured logging with Pino (JSON in production, pretty in dev)
 - ✅ Security hardening (Helmet, CORS, XSS sanitization)
 - ✅ CI/CD pipeline with GitHub Actions
-- ⏳ Production deployment
+- ✅ Docker containerization with multi-stage builds
 
 ## 🤝 Contributing
 
